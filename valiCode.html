@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		body{text-align:center}
+		#cvs{
+			border-radius:5px;
+			cursor:pointer;
+		}
+	</style>
+</head>
+<body>
+	<h1>使用canvas进行验证码的绘制</h1>
+	<canvas id="cvs"></canvas>
+</body>
+<script>
+	(()=>{
+		valiCode(100,35,4,6,30);
+		/**
+		 *生成验证码
+		 * 参数为:验证码框宽、验证码框高、验证码数量，干扰线数量，干扰点数量
+		 */
+		function valiCode(width,height,codeNum,lineNum,dotNum){
+			let cvs=document.getElementById("cvs");
+			let w=width;//定义验证码宽
+			let h=height;//定义验证码高
+			const CODENUM=codeNum;//定义验证码数量
+			const LINENUM=lineNum;//定义干扰线的数量
+			const DOTNUM=dotNum;//定义干扰点的数量
+
+			cvs.width=w;
+			cvs.height=h;
+			let ctx=cvs.getContext("2d");
+
+			/*
+			 *生成一个随机数
+			 */
+			function rn(min,max){
+				return Math.floor(Math.random()*(max-min)+min);
+			}
+
+			/*
+			 *生成一个随机颜色
+			 */
+			function rc(min,max){
+				let r=rn(min,max);
+				let g=rn(min,max);
+				let b=rn(min,max);
+				return `rgb(${r},${g},${b})`;
+			}
+
+			//进行背景绘制
+			ctx.fillStyle=rc(200,250);
+			ctx.fillRect(0,0,w,h);
+
+			//进行文本绘制
+			let pool = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+			let space=(w-20)/(2*(CODENUM-0.5));
+			for(let i=0;i<CODENUM;i++){
+				let index=rn(0,pool.length);
+				let word=pool[index];
+				ctx.save();
+				ctx.rotate(rn(-8,8)*Math.PI/180);
+				ctx.font="20px SimHei";
+				ctx.fillStyle=rc(80,100);
+				ctx.textBaseline="top";
+				ctx.fillText(word,10+2*i*space,8);
+				ctx.restore();
+			}
+
+			//进行干扰线绘制
+			for(let i=0;i<LINENUM;i++){
+				ctx.beginPath();
+				ctx.strokeStyle=rc(0,255);
+				ctx.moveTo(rn(0,w),rn(0,h));
+				ctx.lineTo(rn(0,w),rn(0,h));
+				ctx.stroke();
+			}
+
+			//进行干扰点绘制
+			for(let i=0;i<DOTNUM;i++){
+				ctx.beginPath();
+				ctx.fillStyle=rc(0,255);
+				ctx.arc(rn(0,w),rn(0,h),1,0,2*Math.PI);
+				ctx.fill();
+			}
+		}
+		document.getElementById("cvs").onclick=function(){
+			valiCode(100,35,4,6,30);
+		};
+	})();
+
+</script>
+</html>
